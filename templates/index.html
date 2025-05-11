@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Comment Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube Comment Analyzer</h1>
+            <p class="subtitle">Scrape, analyze, and gain insights from YouTube video comments.</p>
+        </header>
+
+        <section class="input-section">
+            <form method="post" action="/scrap" id="scrapForm">
+                <div class="form-group">
+                    <label for="youtube_url">YouTube Video URL:</label>
+                    <input type="text" id="youtube_url" name="youtube url" required>
+                </div>
+                <button type="submit" id="scrap_button" class="button">Analyze Comments</button>
+                <button type="button" id="download_pdf" class="button pdf-btn">Download PDF Report</button>
+            </form>
+            <div id="loading" class="loading-animation" style="display:none;">
+                <div class="spinner"></div>
+                <p>Fetching and analyzing comments... this may take a few minutes.</p>
+            </div>
+        </section>
+
+        {% if error_message %}
+            <section class="results-section error-message">
+                <h3>Error</h3>
+                <p>{{ error_message }}</p>
+            </section>
+        {% endif %}
+
+        {% if after_complete_message %}
+            <section class="results-section">
+                <h2>{{ after_complete_message }}</h2>
+
+                <div class="card video-details">
+                    <h3>Video Details</h3>
+                    <p><strong>Title:</strong> {{ title }}</p>
+                    <p><strong>Channel:</strong> {{ owner }}</p>
+                    <p><strong>Total Comments (approx. with replies):</strong> {{ comment_w_replies }}</p>
+                    <p><strong>Scraped Comments (without replies):</strong> {{ comment_wo_replies }}</p>
+                </div>
+
+                <div class="card analysis-summary">
+                    <h3>Sentiment Summary</h3>
+                    <div class="sentiment-counts">
+                        <span class="count-good">Good: {{ num_good }}</span>
+                        <span class="count-bad">Bad: {{ num_bad }}</span>
+                        <span class="count-normal">Normal: {{ num_normal }}</span>
+                    </div>
+                </div>
+
+                <div class="card insights-section">
+                    <h3>Video & Audience Insights</h3>
+                    <div class="insights-content">
+                        {{ insights | safe }}
+                    </div>
+                </div>
+
+                <div class="card comments-table-section">
+                    <h3>Classified Comments</h3>
+                    <div class="filter-controls">
+                        <label for="tagFilter">Filter by Tag:</label>
+                        <select id="tagFilter">
+                            <option value="all">All</option>
+                            <option value="good">Good</option>
+                            <option value="bad">Bad</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table id="commentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Comment</th>
+                                    <th>Tag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if raw_classified_comments %}
+                                    {% for item in raw_classified_comments %}
+                                        <tr data-tag="{{ item.tag.lower() }}">
+                                            <td>{{ item.username }}</td>
+                                            <td>{{ item.comment }}</td>
+                                            <td class="tag-cell tag-{{ item.tag.lower() }}">{{ item.tag }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="3">No classified comments to display.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#scrapForm').on('submit', function(){
+                $('#loading').show();
+                $('#scrap_button').prop('disabled', true).text('Analyzing...');
+            });
+
+            $('#tagFilter').on('change', function(){
+                var selectedTag = $(this).val();
+                if (selectedTag === 'all') {
+                    $('#commentsTable tbody tr').show();
+                } else {
+                    $('#commentsTable tbody tr').hide();
+                    $('#commentsTable tbody tr[data-tag="' + selectedTag + '"]').show();
+                }
+            });
+
+            $('#download_pdf').on('click', function(){
+                window.location.href = '/download_pdf';
+            });
+        });
+    </script>
+</body>
+</html>
