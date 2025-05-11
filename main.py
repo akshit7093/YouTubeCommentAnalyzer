@@ -32,7 +32,7 @@ def scrap_comments():
     logger.info("Cleared previous session data")
 
     # Delete old comments file to ensure fresh data
-    comments_file_path = "Full Comments.csv"
+    comments_file_path = "/tmp/Full Comments.csv"
     if os.path.exists(comments_file_path):
         try:
             os.remove(comments_file_path)
@@ -55,7 +55,7 @@ def scrap_comments():
         return render_template('index.html', error_message=f"Error: {comments_file_path} not found. Scraping might have failed.")
 
     # Delete old analysis files to ensure fresh data
-    analysis_files = ["analysis_results.txt", "batch_insights.json"]
+    analysis_files = ["/tmp/analysis_results.txt", "/tmp/batch_insights.json"]
     for f_path in analysis_files:
         if os.path.exists(f_path):
             try:
@@ -151,7 +151,7 @@ def download_pdf():
     logger.info("Starting PDF generation")
 
     # Delete old analysis files to ensure fresh data for PDF
-    analysis_files_pdf = ["analysis_results.txt", "batch_insights.json"]
+    analysis_files_pdf = ["/tmp/analysis_results.txt", "/tmp/batch_insights.json"]
     for f_path_pdf in analysis_files_pdf:
         if os.path.exists(f_path_pdf):
             try:
@@ -163,7 +163,7 @@ def download_pdf():
                 # return f"Error: Could not delete old analysis file for PDF: {e}", 500
 
     # Re-run analysis
-    comments_file_path = "Full Comments.csv"
+    comments_file_path = "/tmp/Full Comments.csv"
     if not os.path.exists(comments_file_path):
         logger.error(f"{comments_file_path} not found for PDF generation")
         return "Comments file not found.", 404

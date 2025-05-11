@@ -112,16 +112,16 @@ def scrapfyt(url):
   users = driver.find_elements(By.XPATH, '//*[@id="author-text"]/span')
   comments = driver.find_elements(By.XPATH, '//*[@id="content-text"]')
 
-  with io.open('comments.csv', 'w', newline='', encoding="utf-16") as file:
+  with io.open('/tmp/comments.csv', 'w', newline='', encoding="utf-16") as file:
       writer = csv.writer(file, delimiter =",", quoting=csv.QUOTE_ALL)
       writer.writerow(["Username", "Comment"])
       for username, comment in zip(users, comments):
           writer.writerow([username.text, comment.text])
     
-  commentsfile = pd.read_csv("comments.csv", encoding ="utf-16")  # , encoding ="utf-16", engine = 'python'
+  commentsfile = pd.read_csv("/tmp/comments.csv", encoding ="utf-16")  # , encoding ="utf-16", engine = 'python'
 
   all_comments = commentsfile.replace(np.nan, '-', regex = True)
-  all_comments = all_comments.to_csv("Full Comments.csv", index = False)
+  all_comments = all_comments.to_csv("/tmp/Full Comments.csv", index = False)
   # comments.to_html("Comments2.html")
 
   ##total comments without replies
