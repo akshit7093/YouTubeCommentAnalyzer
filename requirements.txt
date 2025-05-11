@@ -28,3 +28,4 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
 regex==2024.5.15
 urllib3==1.26.19
+setuptools>=42 # Required for distutils
